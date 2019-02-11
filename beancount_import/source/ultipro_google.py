@@ -311,7 +311,7 @@ class UltiproSource(Config, Source):
         for pay_date, _, parse_result, filename in parsed_statements:
             results.add_pending_entry(
                 self._get_import_result(
-                    parse_result=parse_result, rules=rules, path=path))
+                    parse_result=parse_result, rules=rules, path=filename))
 
         for seen_key, entries in documents_seen_in_journal.items():
             num_expected = (1 if seen_key in documents_seen_in_directory else 0)
