@@ -71,7 +71,7 @@ from .stockplanconnect_statement import Release, TradeConfirmation, get_document
 AWARD_NOTE_KEY = 'stock_award_note'
 AWARD_ID_KEY = 'stock_award_id'
 TRADE_REFERENCE_NUMBER_KEY = 'trade_ref_number'
-
+IGNORE_KEY = 'beancount_import_ignore'
 
 def load_documents(directory: str, log_status: LogFunction):
     releases = []
@@ -180,6 +180,7 @@ class StockplanconnectSource(Source):
         for entry in entries:
             if not isinstance(entry, Transaction): continue
             for posting in entry.postings:
+                if IGNORE_KEY in posting.meta: continue
                 if self.year is not None and self.year != get_posting_date(entry, posting).year:
                     continue
                 if posting.account.startswith(income_account_prefix):
@@ -492,6 +493,8 @@ class StockplanconnectSource(Source):
         if posting.meta is None:
             return False
         if posting.account.startswith('Income:'):
+            return True
+        if IGNORE_KEY in posting.meta:
             return True
         return ((AWARD_ID_KEY in posting.meta or
                  TRADE_REFERENCE_NUMBER_KEY in posting.meta) and
