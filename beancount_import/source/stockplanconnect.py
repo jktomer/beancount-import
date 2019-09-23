@@ -225,15 +225,6 @@ class StockplanconnectSource(Source):
             tags=EMPTY_SET,
             links=EMPTY_SET,
             postings=[])
-        txn.postings.append(
-            Posting(
-                account=self.get_income_account(r),
-                units=-r.amount_released,
-                cost=None,
-                meta={POSTING_DATE_KEY: r.release_date},
-                price=r.vest_price,
-                flag=None,
-            ))
 
         vest_cost_spec = CostSpec(
             number_per=r.vest_price.number,
@@ -242,6 +233,16 @@ class StockplanconnectSource(Source):
             date=r.vest_date,
             label=r.award_id,
             merge=False)
+
+        txn.postings.append(
+            Posting(
+                account=self.get_income_account(r),
+                units=-r.amount_released,
+                cost=vest_cost_spec,
+                meta={POSTING_DATE_KEY: r.release_date},
+                price=r.vest_price,
+                flag=None,
+            ))
 
         txn.postings.append(
             Posting(
